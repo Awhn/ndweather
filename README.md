@@ -14,3 +14,14 @@ open http://localhost:8080/display
 ```
 
 구조: `backend`(Go), `frontend`(React), `migrations`(SQLite), `api/openapi.yaml`, `config/sites.yaml`, `scripts`, 배포/운영 문서. 화면은 Space 정지/재개, ←/→ 수동 이동 및 `?page=1|2&rotate=false`를 지원합니다.
+
+## 기상정보 외부정보시스템 연동
+
+`KMA_SERVICE_KEY`를 설정하면 서버가 외부정보시스템이 제공하는 기상청 단기예보 조회서비스 2.0 호환 엔드포인트의 `getVilageFcst`를 사업소별 DFS 격자로 조회합니다. 외부정보시스템은 별도의 배치 데이터 원천이 아니라 기상청 API 연계 구간이며, 운영 환경에서는 제공받은 엔드포인트로 `KMA_ENDPOINT`만 교체합니다. 기본값은 공공데이터포털 원본 엔드포인트이므로 로컬 검증에도 같은 요청·응답 규격을 사용합니다.
+
+- `KMA_SERVICE_KEY`: 공공데이터포털 일반 인증키(미설정 시 직접 연동 비활성화)
+- `KMA_ENDPOINT`: 외부정보시스템의 서비스 기본 URL 또는 `getVilageFcst` 전체 URL. 기본값 `https://apis.data.go.kr/1360000/VilageFcstInfoService_2.0`
+- `KMA_POLL_SECONDS`: 조회 주기, 기본값 `3600`
+- `KMA_APIHUB_KEY`: 레이더·태풍·특보 조회용 기상청 API허브 인증키(미설정 시 API허브 연동 비활성화)
+- `KMA_APIHUB_ENDPOINT`: 기본값 `https://apihub.kma.go.kr`
+- `KMA_APIHUB_POLL_SECONDS`: API허브 조회 주기, 기본값 `600`
