@@ -6,6 +6,7 @@ import (
 	"path/filepath"
 	"strconv"
 	"time"
+	_ "time/tzdata"
 )
 
 type Config struct {
