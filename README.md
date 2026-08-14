@@ -14,3 +14,11 @@ open http://localhost:8080/display
 ```
 
 구조: `backend`(Go), `frontend`(React), `migrations`(SQLite), `api/openapi.yaml`, `config/sites.yaml`, `scripts`, 배포/운영 문서. 화면은 Space 정지/재개, ←/→ 수동 이동 및 `?page=1|2&rotate=false`를 지원합니다.
+
+## 기상청 단기예보 직접 연동
+
+`KMA_SERVICE_KEY`를 설정하면 서버가 기상청 단기예보 조회서비스 2.0의 `getVilageFcst`를 사업소별 DFS 격자로 조회합니다. 수집 결과는 외부 정보시스템 배치와 동일한 내부 수신·검증·저장 경로를 사용합니다.
+
+- `KMA_SERVICE_KEY`: 공공데이터포털 일반 인증키(미설정 시 직접 연동 비활성화)
+- `KMA_ENDPOINT`: 기본값 `https://apis.data.go.kr/1360000/VilageFcstInfoService_2.0`
+- `KMA_POLL_SECONDS`: 조회 주기, 기본값 `3600`

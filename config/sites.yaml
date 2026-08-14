@@ -1,18 +1,105 @@
-- code: SAMPLE
-  name: 샘플사업소
-  latitude: 37.0000
-  longitude: 127.0000
-  forecastGridX: 60
-  forecastGridY: 127
-  warningAreaCodes: [SAMPLE-AREA]
+# 기상정보 시스템 사업소 설정
+# 조사일: 2026-08-14
+# 좌표계: WGS84(EPSG:4326)
+# forecastGridX/Y: 기상청 단기예보 5 km DFS 격자(nx/ny)
+# warningAreaCodes: 기상특보 구역코드 확정 후 별도 입력
+# 발전소 부지는 넓으므로 대표 건물 또는 사업장 중심점을 사용함.
+
+# 주소: 경상남도 진주시 사들로123번길 32 (충무공동)
+# 좌표 기준: 본사 건물 주소점
+# 주소 출처: https://www.koenergy.kr/kosep/hw/fr/ov/ovhw31/main.do?menuCd=FN030701
+# 좌표 출처: https://findby.co.kr/details/52852-481703350089-st-652c085ff27008be2c4a5fc1
+- code: HQ
+  name: 한국남동발전 본사
+  latitude: 35.1803572
+  longitude: 128.1455947
+  forecastGridX: 81
+  forecastGridY: 75
+  warningAreaCodes: []
   displayOrder: 1
   enabled: true
-- code: SOUTH
-  name: 남부샘플사업소
-  latitude: 35.1800
-  longitude: 128.1000
-  forecastGridX: 89
-  forecastGridY: 77
-  warningAreaCodes: [SOUTH-AREA]
+
+# 주소: 경상남도 고성군 하이면 하이로 1
+# 좌표 기준: 삼천포발전본부 대표 건물 주소점
+# 주소 출처: https://www.koenergy.kr/kosep/hw/fr/ov/ovhw32/main.do?menuCd=FN030702
+# 좌표 출처: https://rlh.purpleo.kr/article/3122
+- code: SAMCHEONPO
+  name: 삼천포발전본부
+  latitude: 34.9109650
+  longitude: 128.1092482
+  forecastGridX: 81
+  forecastGridY: 69
+  warningAreaCodes: []
   displayOrder: 2
+  enabled: true
+
+# 주소: 인천광역시 옹진군 영흥면 영흥남로293번길 75
+# 좌표 기준: 영흥발전본부 도로명주소 주소점
+# 주소 출처: https://www.koenergy.kr/kosep/hw/fr/ov/ovhw32/main.do?menuCd=FN030702
+# 좌표 출처: https://findby.co.kr/details/23120-287204274155-st-652b76bf8c641f9e38a806c9
+- code: YEONGHEUNG
+  name: 영흥발전본부
+  latitude: 37.2399356
+  longitude: 126.4384846
+  forecastGridX: 51
+  forecastGridY: 120
+  warningAreaCodes: []
+  displayOrder: 3
+  enabled: true
+
+# 주소: 경기도 성남시 분당구 분당로 336
+# 좌표 기준: 분당발전본부 도로명주소 주소점
+# 주소 출처: https://www.koenergy.kr/kosep/hw/fr/ov/ovhw32/main.do?menuCd=FN030702
+# 좌표 출처: https://www.data.go.kr/data/15037039/fileData.do?recommendDataYn=Y
+- code: BUNDANG
+  name: 분당발전본부
+  latitude: 37.3656100
+  longitude: 127.1467400
+  forecastGridX: 63
+  forecastGridY: 122
+  warningAreaCodes: []
+  displayOrder: 4
+  enabled: true
+
+# 주소: 강원특별자치도 강릉시 강동면 염전길 99
+# 좌표 기준: 영동에코발전본부 발전용 본관 주소점
+# 주소 출처: https://www.koenergy.kr/kosep/hw/fr/ov/ovhw32/main.do?menuCd=FN030702
+# 좌표 출처: https://www.data.go.kr/data/15155662/standard.do?recommendDataYn=Y
+- code: YEONGDONG_ECO
+  name: 영동에코발전본부
+  latitude: 37.7384122
+  longitude: 128.9766237
+  forecastGridX: 94
+  forecastGridY: 131
+  warningAreaCodes: []
+  displayOrder: 5
+  enabled: true
+
+# 주소: 전라남도 여수시 여수산단로 727 (중흥동)
+# 좌표 기준: 여수발전본부 대표 건물 주소점
+# 주소 출처: https://www.koenergy.kr/kosep/hw/fr/ov/ovhw44/main.do?menuCd=FN030706
+# 좌표 출처: https://trb.purpleo.kr/article/58683
+- code: YEOSU
+  name: 여수발전본부
+  latitude: 34.8400082
+  longitude: 127.6908469
+  forecastGridX: 73
+  forecastGridY: 68
+  warningAreaCodes: []
+  displayOrder: 6
+  enabled: true
+
+# 사업지: 제주특별자치도 제주시 애월읍 어음리 산68-4 일원(어음2리 공동목장)
+# 좌표 기준: 대규모 풍력단지의 대표점. 단일 건물 좌표가 아니므로 근사값임.
+# 사업 출처: https://kind.krx.co.kr/external/2024/02/29/000838/20240229001900/10001.htm
+# 사업지 참고: https://www.jejusori.net/news/articleView.html?idxno=177849
+# 대표점 참고: https://www.visitjeju.net/kr/detail/view?contentsid=CNTS_200000000014030
+- code: JEJU_EOEUM_WIND
+  name: 제주 어음풍력발전사업
+  latitude: 33.3776440
+  longitude: 126.3681720
+  forecastGridX: 50
+  forecastGridY: 35
+  warningAreaCodes: []
+  displayOrder: 7
   enabled: true

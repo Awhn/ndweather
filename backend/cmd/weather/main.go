@@ -8,6 +8,7 @@ import (
 	"ndweather/backend/internal/config"
 	"ndweather/backend/internal/httpapi"
 	"ndweather/backend/internal/ingest"
+	"ndweather/backend/internal/kma"
 	"ndweather/backend/internal/store"
 	"net/http"
 	"os"
@@ -44,6 +45,9 @@ func main() {
 	ctx, cancel := context.WithCancel(context.Background())
 	defer cancel()
 	go cleanup(ctx, s, c)
+	if c.KMAServiceKey != "" {
+		go collectKMA(ctx, c, s, svc)
+	}
 	if c.IngestMode == "directory" {
 		go inbox(ctx, c, svc)
 	}
@@ -64,6 +68,37 @@ func main() {
 	defer done()
 	_ = server.Shutdown(x)
 	slog.Info("shutdown complete")
+}
+func collectKMA(ctx context.Context, c config.Config, s *store.Store, svc *ingest.Service) {
+	loc, _ := time.LoadLocation(c.Timezone)
+	client := &kma.Client{Endpoint: c.KMAEndpoint, ServiceKey: c.KMAServiceKey, HTTP: &http.Client{Timeout: 20 * time.Second}, Location: loc}
+	collect := func() {
+		sites, e := s.Sites()
+		if e != nil {
+			slog.Error("KMA sites unavailable", "error", e)
+			return
+		}
+		for _, site := range sites {
+			batch, e := client.Fetch(ctx, site, time.Now())
+			if e == nil {
+				_, e = svc.Process(ctx, batch)
+			}
+			if e != nil {
+				slog.Error("KMA collection failed", "site", site.Code, "error", e)
+			}
+		}
+	}
+	collect()
+	ticker := time.NewTicker(time.Duration(c.KMAPollSeconds) * time.Second)
+	defer ticker.Stop()
+	for {
+		select {
+		case <-ctx.Done():
+			return
+		case <-ticker.C:
+			collect()
+		}
+	}
 }
 func itoa(n int) string {
 	const ds = "0123456789"
