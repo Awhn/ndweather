@@ -1,0 +1,16 @@
+CREATE TABLE IF NOT EXISTS schema_migrations(version INTEGER PRIMARY KEY, applied_at TEXT NOT NULL);
+CREATE TABLE IF NOT EXISTS sites(code TEXT PRIMARY KEY,name TEXT NOT NULL,latitude REAL NOT NULL,longitude REAL NOT NULL,forecast_grid_x INTEGER NOT NULL,forecast_grid_y INTEGER NOT NULL,warning_area_codes TEXT NOT NULL,display_order INTEGER NOT NULL,enabled INTEGER NOT NULL);
+CREATE TABLE IF NOT EXISTS ingest_batches(batch_id TEXT PRIMARY KEY,source TEXT NOT NULL,source_created_at TEXT NOT NULL,received_at TEXT NOT NULL,status TEXT NOT NULL,result_json TEXT NOT NULL);
+CREATE TABLE IF NOT EXISTS ingest_errors(id INTEGER PRIMARY KEY,batch_id TEXT,error_code TEXT NOT NULL,message TEXT NOT NULL,received_at TEXT NOT NULL);
+CREATE TABLE IF NOT EXISTS observations(id INTEGER PRIMARY KEY,site_code TEXT NOT NULL REFERENCES sites(code),observed_at TEXT NOT NULL,received_at TEXT NOT NULL,temperature REAL,humidity REAL,wind_direction TEXT,wind_speed REAL,gust_speed REAL,precipitation REAL,precipitation_state TEXT,sky TEXT, UNIQUE(site_code,observed_at));
+CREATE INDEX IF NOT EXISTS observations_latest ON observations(site_code,observed_at DESC);
+CREATE TABLE IF NOT EXISTS forecasts(id INTEGER PRIMARY KEY,site_code TEXT NOT NULL REFERENCES sites(code),issued_at TEXT NOT NULL,valid_at TEXT NOT NULL,received_at TEXT NOT NULL,min_temperature REAL,max_temperature REAL,rain_probability INTEGER,sky TEXT, UNIQUE(site_code,issued_at,valid_at));
+CREATE INDEX IF NOT EXISTS forecasts_latest ON forecasts(site_code,valid_at DESC);
+CREATE TABLE IF NOT EXISTS warnings(id INTEGER PRIMARY KEY,warning_id TEXT UNIQUE NOT NULL,phenomenon TEXT NOT NULL,level TEXT NOT NULL,area_code TEXT NOT NULL,area_name TEXT NOT NULL,announced_at TEXT NOT NULL,effective_at TEXT NOT NULL,expires_at TEXT,received_at TEXT NOT NULL);
+CREATE TABLE IF NOT EXISTS warning_sites(warning_id INTEGER NOT NULL REFERENCES warnings(id) ON DELETE CASCADE,site_code TEXT NOT NULL REFERENCES sites(code),PRIMARY KEY(warning_id,site_code));
+CREATE TABLE IF NOT EXISTS radar_assets(id INTEGER PRIMARY KEY,asset_id TEXT UNIQUE NOT NULL,sha256 TEXT UNIQUE NOT NULL,content_type TEXT NOT NULL,path TEXT NOT NULL,observed_at TEXT NOT NULL,received_at TEXT NOT NULL,size INTEGER NOT NULL);
+CREATE INDEX IF NOT EXISTS radar_latest ON radar_assets(observed_at DESC);
+CREATE TABLE IF NOT EXISTS typhoons(id INTEGER PRIMARY KEY,typhoon_key TEXT UNIQUE NOT NULL,number TEXT NOT NULL,name TEXT NOT NULL,latitude REAL,longitude REAL,pressure INTEGER,max_wind REAL,direction TEXT,speed REAL,announced_at TEXT NOT NULL,received_at TEXT NOT NULL,active INTEGER NOT NULL);
+CREATE TABLE IF NOT EXISTS typhoon_forecast_points(id INTEGER PRIMARY KEY,typhoon_id INTEGER NOT NULL REFERENCES typhoons(id) ON DELETE CASCADE,forecast_at TEXT NOT NULL,latitude REAL NOT NULL,longitude REAL NOT NULL,pressure INTEGER,max_wind REAL,UNIQUE(typhoon_id,forecast_at));
+CREATE TABLE IF NOT EXISTS display_settings(key TEXT PRIMARY KEY,value TEXT NOT NULL);
+INSERT OR IGNORE INTO schema_migrations VALUES(1,datetime('now'));

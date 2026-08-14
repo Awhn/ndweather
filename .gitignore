@@ -1,0 +1,11 @@
+.env
+.env.internal
+data/
+web/
+frontend/node_modules/
+frontend/dist/
+*.db*
+*.tar
+
+bin/
+frontend/*.tsbuildinfo

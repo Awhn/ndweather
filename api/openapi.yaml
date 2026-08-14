@@ -1,0 +1,45 @@
+openapi: 3.1.0
+info: {title: KOEN Internal Weather API, version: 1.0.0}
+servers: [{url: /}]
+components:
+  securitySchemes:
+    bearer: {type: http, scheme: bearer}
+  schemas:
+    Envelope:
+      type: object
+      required: [apiVersion, generatedAt, data]
+      properties:
+        apiVersion: {const: v1}
+        generatedAt: {type: string, format: date-time}
+        data: {}
+paths:
+  /health/live:
+    get: {summary: Process liveness, responses: {'200': {description: Live}}}
+  /health/ready:
+    get: {summary: Configuration, DB and storage readiness, responses: {'200': {description: Ready}, '503': {description: Not ready}}}
+  /api/v1/ingest/batches:
+    post:
+      summary: Atomically ingest one schema 1.0 batch
+      security: [{bearer: []}]
+      requestBody: {required: true, content: {application/json: {schema: {type: object, required: [schemaVersion,batchId,source,createdAt,records,assets]}}}}
+      responses: {'200': {description: Processed or idempotent duplicate}, '400': {description: Validation failure}, '401': {description: Unauthorized}, '413': {description: Request too large}}
+  /api/v1/sites: {get: {$ref: '#/$defs/read'}}
+  /api/v1/observations/latest: {get: {$ref: '#/$defs/read'}}
+  /api/v1/observations:
+    get:
+      security: [{bearer: []}]
+      parameters: [{name: since, in: query, schema: {type: string, format: date-time}}, {name: limit, in: query, schema: {type: integer, minimum: 1, maximum: 500}}]
+      responses: {'200': {description: Observation history}}
+  /api/v1/forecasts/latest: {get: {$ref: '#/$defs/read'}}
+  /api/v1/warnings/active: {get: {$ref: '#/$defs/read'}}
+  /api/v1/radar/latest: {get: {$ref: '#/$defs/read'}}
+  /api/v1/radar/frames: {get: {$ref: '#/$defs/read'}}
+  /api/v1/typhoons/active: {get: {$ref: '#/$defs/read'}}
+  /api/v1/display/dashboard: {get: {$ref: '#/$defs/read'}}
+  /api/v1/status: {get: {$ref: '#/$defs/read'}}
+$defs:
+  read:
+    security: [{bearer: []}]
+    responses:
+      '200': {description: Versioned envelope, content: {application/json: {schema: {$ref: '#/components/schemas/Envelope'}}}}
+      '401': {description: Read token required}
