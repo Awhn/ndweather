@@ -24,5 +24,4 @@ COPY --from=backend /src/web /app/web
 USER 10001:10001
 ENV APP_ENV=production BIND_ADDRESS=0.0.0.0 PORT=8080 DATA_DIR=/data SQLITE_PATH=/data/weather.db ASSET_DIR=/data/assets INBOX_DIR=/data/inbox SITES_CONFIG=/app/config/sites.yaml
 EXPOSE 8080
-VOLUME ["/data"]
 ENTRYPOINT ["/app/weather"]
