@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"errors"
 	"log/slog"
+	"ndweather/backend/internal/apihub"
 	"ndweather/backend/internal/config"
 	"ndweather/backend/internal/httpapi"
 	"ndweather/backend/internal/ingest"
@@ -48,6 +49,9 @@ func main() {
 	if c.KMAServiceKey != "" {
 		go collectKMA(ctx, c, s, svc)
 	}
+	if c.KMAAPIHubKey != "" {
+		go collectAPIHub(ctx, c, s, svc)
+	}
 	if c.IngestMode == "directory" {
 		go inbox(ctx, c, svc)
 	}
@@ -68,6 +72,42 @@ func main() {
 	defer done()
 	_ = server.Shutdown(x)
 	slog.Info("shutdown complete")
+}
+func collectAPIHub(ctx context.Context, c config.Config, s *store.Store, svc *ingest.Service) {
+	loc, _ := time.LoadLocation(c.Timezone)
+	client := &apihub.Client{Endpoint: c.KMAAPIHubEndpoint, AuthKey: c.KMAAPIHubKey, HTTP: &http.Client{Timeout: 30 * time.Second}, Location: loc}
+	collect := func() {
+		now := time.Now()
+		sites, e := s.Sites()
+		if e != nil {
+			slog.Error("API Hub sites unavailable", "error", e)
+			return
+		}
+		fetches := []struct {
+			name  string
+			fetch func() (ingest.Batch, error)
+		}{{"radar", func() (ingest.Batch, error) { return client.FetchRadar(ctx, now) }}, {"warnings", func() (ingest.Batch, error) { return client.FetchWarnings(ctx, sites, now) }}, {"typhoons", func() (ingest.Batch, error) { return client.FetchTyphoons(ctx, now) }}}
+		for _, f := range fetches {
+			batch, e := f.fetch()
+			if e == nil {
+				_, e = svc.Process(ctx, batch)
+			}
+			if e != nil {
+				slog.Error("API Hub collection failed", "product", f.name, "error", e)
+			}
+		}
+	}
+	collect()
+	ticker := time.NewTicker(time.Duration(c.KMAAPIHubPollSeconds) * time.Second)
+	defer ticker.Stop()
+	for {
+		select {
+		case <-ctx.Done():
+			return
+		case <-ticker.C:
+			collect()
+		}
+	}
 }
 func collectKMA(ctx context.Context, c config.Config, s *store.Store, svc *ingest.Service) {
 	loc, _ := time.LoadLocation(c.Timezone)

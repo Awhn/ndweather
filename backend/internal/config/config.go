@@ -10,9 +10,9 @@ import (
 )
 
 type Config struct {
-	AppEnv, Bind, DataDir, DBPath, AssetDir, InboxDir, IngestMode, IngestToken, ReadToken, Timezone, SitesPath, KMAServiceKey, KMAEndpoint        string
-	Port, RotateSeconds, RefreshSeconds, RadarSeconds, StaleMinutes, RetentionDays, RadarRetentionHours, MaxRequestMB, MaxAssetMB, KMAPollSeconds int
-	Demo                                                                                                                                          bool
+	AppEnv, Bind, DataDir, DBPath, AssetDir, InboxDir, IngestMode, IngestToken, ReadToken, Timezone, SitesPath, KMAServiceKey, KMAEndpoint, KMAAPIHubKey, KMAAPIHubEndpoint string
+	Port, RotateSeconds, RefreshSeconds, RadarSeconds, StaleMinutes, RetentionDays, RadarRetentionHours, MaxRequestMB, MaxAssetMB, KMAPollSeconds, KMAAPIHubPollSeconds     int
+	Demo                                                                                                                                                                    bool
 }
 
 func env(k, d string) string {
@@ -30,13 +30,13 @@ func integer(k string, d int) (int, error) {
 	return n, nil
 }
 func Load() (Config, error) {
-	c := Config{AppEnv: env("APP_ENV", "development"), Bind: env("BIND_ADDRESS", "0.0.0.0"), DataDir: env("DATA_DIR", "./data"), IngestMode: env("INGEST_MODE", "http"), IngestToken: os.Getenv("INGEST_TOKEN"), ReadToken: os.Getenv("READ_API_TOKEN"), Timezone: env("TIMEZONE", "Asia/Seoul"), SitesPath: env("SITES_CONFIG", "config/sites.yaml"), KMAServiceKey: os.Getenv("KMA_SERVICE_KEY"), KMAEndpoint: env("KMA_ENDPOINT", "https://apis.data.go.kr/1360000/VilageFcstInfoService_2.0"), Demo: env("DEMO_MODE", "false") == "true"}
+	c := Config{AppEnv: env("APP_ENV", "development"), Bind: env("BIND_ADDRESS", "0.0.0.0"), DataDir: env("DATA_DIR", "./data"), IngestMode: env("INGEST_MODE", "http"), IngestToken: os.Getenv("INGEST_TOKEN"), ReadToken: os.Getenv("READ_API_TOKEN"), Timezone: env("TIMEZONE", "Asia/Seoul"), SitesPath: env("SITES_CONFIG", "config/sites.yaml"), KMAServiceKey: os.Getenv("KMA_SERVICE_KEY"), KMAEndpoint: env("KMA_ENDPOINT", "https://apis.data.go.kr/1360000/VilageFcstInfoService_2.0"), KMAAPIHubKey: os.Getenv("KMA_APIHUB_KEY"), KMAAPIHubEndpoint: env("KMA_APIHUB_ENDPOINT", "https://apihub.kma.go.kr"), Demo: env("DEMO_MODE", "false") == "true"}
 	var e error
 	for _, x := range []struct {
 		k string
 		d int
 		p *int
-	}{{"PORT", 8080, &c.Port}, {"DISPLAY_ROTATE_SECONDS", 5, &c.RotateSeconds}, {"DISPLAY_REFRESH_SECONDS", 30, &c.RefreshSeconds}, {"RADAR_FRAME_SECONDS", 1, &c.RadarSeconds}, {"DATA_STALE_MINUTES", 20, &c.StaleMinutes}, {"RETENTION_DAYS", 30, &c.RetentionDays}, {"RADAR_RETENTION_HOURS", 72, &c.RadarRetentionHours}, {"MAX_REQUEST_MB", 25, &c.MaxRequestMB}, {"MAX_ASSET_MB", 20, &c.MaxAssetMB}, {"KMA_POLL_SECONDS", 3600, &c.KMAPollSeconds}} {
+	}{{"PORT", 8080, &c.Port}, {"DISPLAY_ROTATE_SECONDS", 5, &c.RotateSeconds}, {"DISPLAY_REFRESH_SECONDS", 30, &c.RefreshSeconds}, {"RADAR_FRAME_SECONDS", 1, &c.RadarSeconds}, {"DATA_STALE_MINUTES", 20, &c.StaleMinutes}, {"RETENTION_DAYS", 30, &c.RetentionDays}, {"RADAR_RETENTION_HOURS", 72, &c.RadarRetentionHours}, {"MAX_REQUEST_MB", 25, &c.MaxRequestMB}, {"MAX_ASSET_MB", 20, &c.MaxAssetMB}, {"KMA_POLL_SECONDS", 3600, &c.KMAPollSeconds}, {"KMA_APIHUB_POLL_SECONDS", 600, &c.KMAAPIHubPollSeconds}} {
 		*x.p, e = integer(x.k, x.d)
 		if e != nil {
 			return c, e

@@ -44,7 +44,11 @@ func (c *Client) Fetch(ctx context.Context, site store.Site, now time.Time) (ing
 		loc = time.Local
 	}
 	base := latestBase(now.In(loc))
-	u, err := url.Parse(strings.TrimRight(c.Endpoint, "/") + "/getVilageFcst")
+	endpoint := strings.TrimRight(c.Endpoint, "/")
+	if !strings.HasSuffix(endpoint, "/getVilageFcst") {
+		endpoint += "/getVilageFcst"
+	}
+	u, err := url.Parse(endpoint)
 	if err != nil {
 		return ingest.Batch{}, err
 	}

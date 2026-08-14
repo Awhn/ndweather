@@ -31,4 +31,7 @@ func TestLoadDefaultTimezone(t *testing.T) {
 	if config.KMAEndpoint != "https://apis.data.go.kr/1360000/VilageFcstInfoService_2.0" || config.KMAPollSeconds != 3600 {
 		t.Fatalf("unexpected KMA defaults: endpoint=%q poll=%d", config.KMAEndpoint, config.KMAPollSeconds)
 	}
+	if config.KMAAPIHubEndpoint != "https://apihub.kma.go.kr" || config.KMAAPIHubPollSeconds != 600 {
+		t.Fatalf("unexpected API Hub defaults: endpoint=%q poll=%d", config.KMAAPIHubEndpoint, config.KMAAPIHubPollSeconds)
+	}
 }

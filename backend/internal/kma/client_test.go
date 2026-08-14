@@ -43,3 +43,19 @@ func TestLatestBaseWaitsForPublication(t *testing.T) {
 		t.Fatalf("base = %v", got)
 	}
 }
+
+func TestFetchAcceptsOperationEndpoint(t *testing.T) {
+	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		if r.URL.Path != "/gateway/getVilageFcst" {
+			t.Fatalf("operation path was appended twice: %s", r.URL.Path)
+		}
+		w.Header().Set("Content-Type", "application/json")
+		_, _ = w.Write([]byte(`{"response":{"header":{"resultCode":"00","resultMsg":"NORMAL_SERVICE"},"body":{"items":{"item":[{"category":"TMP","fcstDate":"20260814","fcstTime":"1200","fcstValue":"27"}]}}}}`))
+	}))
+	defer server.Close()
+	loc, _ := time.LoadLocation("Asia/Seoul")
+	c := Client{Endpoint: server.URL + "/gateway/getVilageFcst", ServiceKey: "key", HTTP: server.Client(), Location: loc}
+	if _, err := c.Fetch(context.Background(), store.Site{Code: "HQ", GridX: 81, GridY: 75}, time.Date(2026, 8, 14, 11, 20, 0, 0, loc)); err != nil {
+		t.Fatal(err)
+	}
+}
