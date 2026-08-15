@@ -2,9 +2,7 @@ services:
   weather-system:
     build: .
     ports: ["${HOST_PORT:-8080}:8080"]
-    environment:
-      INGEST_TOKEN: ${INGEST_TOKEN:-development-token-change-me}
-      DEMO_MODE: ${DEMO_MODE:-true}
+    env_file: [.env]
     volumes: [weather-data:/data]
 volumes:
   weather-data:

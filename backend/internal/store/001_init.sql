@@ -13,4 +13,6 @@ CREATE INDEX IF NOT EXISTS radar_latest ON radar_assets(observed_at DESC);
 CREATE TABLE IF NOT EXISTS typhoons(id INTEGER PRIMARY KEY,typhoon_key TEXT UNIQUE NOT NULL,number TEXT NOT NULL,name TEXT NOT NULL,latitude REAL,longitude REAL,pressure INTEGER,max_wind REAL,direction TEXT,speed REAL,announced_at TEXT NOT NULL,received_at TEXT NOT NULL,active INTEGER NOT NULL);
 CREATE TABLE IF NOT EXISTS typhoon_forecast_points(id INTEGER PRIMARY KEY,typhoon_id INTEGER NOT NULL REFERENCES typhoons(id) ON DELETE CASCADE,forecast_at TEXT NOT NULL,latitude REAL NOT NULL,longitude REAL NOT NULL,pressure INTEGER,max_wind REAL,UNIQUE(typhoon_id,forecast_at));
 CREATE TABLE IF NOT EXISTS display_settings(key TEXT PRIMARY KEY,value TEXT NOT NULL);
+CREATE TABLE IF NOT EXISTS collector_status(name TEXT PRIMARY KEY,last_attempt_at TEXT NOT NULL,last_success_at TEXT,last_error TEXT);
+CREATE TABLE IF NOT EXISTS readiness_probe(id INTEGER PRIMARY KEY,checked_at TEXT NOT NULL);
 INSERT OR IGNORE INTO schema_migrations VALUES(1,datetime('now'));
