@@ -40,13 +40,19 @@ func (c *Client) get(ctx context.Context, path string, query url.Values) ([]byte
 	}
 	res, err := h.Do(req)
 	if err != nil {
-		return nil, "", err
+		if requestErr, ok := err.(*url.Error); ok {
+			err = requestErr.Err
+		}
+		return nil, "", fmt.Errorf("API Hub request failed: %w", err)
 	}
 	defer res.Body.Close()
 	if res.StatusCode != http.StatusOK {
 		return nil, "", fmt.Errorf("API Hub HTTP status %d", res.StatusCode)
 	}
-	b, err := io.ReadAll(io.LimitReader(res.Body, 25<<20))
+	b, err := io.ReadAll(io.LimitReader(res.Body, (25<<20)+1))
+	if err == nil && len(b) > 25<<20 {
+		return nil, "", fmt.Errorf("API Hub response exceeds 25 MiB")
+	}
 	return b, res.Header.Get("Content-Type"), err
 }
 
@@ -72,7 +78,7 @@ func (c *Client) FetchRadar(ctx context.Context, now time.Time) (ingest.Batch, e
 
 func (c *Client) FetchWarnings(ctx context.Context, sites []store.Site, now time.Time) (ingest.Batch, error) {
 	loc := c.location()
-	q := url.Values{"reg": {"0"}, "wrn": {"A"}, "tmfc1": {now.In(loc).Add(-24 * time.Hour).Format("200601021504")}, "tmfc2": {now.In(loc).Format("200601021504")}, "disp": {"0"}, "help": {"0"}}
+	q := url.Values{"reg": {"0"}, "wrn": {"A"}, "tmfc1": {now.In(loc).AddDate(0, 0, -7).Format("200601021504")}, "tmfc2": {now.In(loc).Format("200601021504")}, "disp": {"0"}, "help": {"0"}}
 	b, _, err := c.get(ctx, "/api/typ01/url/wrn_met_data.php", q)
 	if err != nil {
 		return ingest.Batch{}, err
@@ -139,11 +145,14 @@ func (c *Client) FetchTyphoons(ctx context.Context, now time.Time) (ingest.Batch
 		if !ok {
 			continue
 		}
-		pressure, _ := strconv.Atoi(analysis["PS"])
-		wind, _ := strconv.ParseFloat(analysis["WS"], 64)
-		speed, _ := strconv.ParseFloat(analysis["SP"], 64)
-		lat, _ := strconv.ParseFloat(analysis["LAT"], 64)
-		lon, _ := strconv.ParseFloat(analysis["LON"], 64)
+		pressure, pressureErr := strconv.Atoi(analysis["PS"])
+		wind, windErr := strconv.ParseFloat(analysis["WS"], 64)
+		speed, speedErr := strconv.ParseFloat(analysis["SP"], 64)
+		lat, latErr := strconv.ParseFloat(analysis["LAT"], 64)
+		lon, lonErr := strconv.ParseFloat(analysis["LON"], 64)
+		if pressureErr != nil || windErr != nil || speedErr != nil || latErr != nil || lonErr != nil {
+			continue
+		}
 		name := names[key]
 		if name == "" {
 			name = analysis["TYP_NAME"]
@@ -160,10 +169,13 @@ func (c *Client) FetchTyphoons(ctx context.Context, now time.Time) (ingest.Batch
 			if !ok {
 				continue
 			}
-			la, _ := strconv.ParseFloat(r["LAT"], 64)
-			lo, _ := strconv.ParseFloat(r["LON"], 64)
-			p, _ := strconv.Atoi(r["PS"])
-			w, _ := strconv.ParseFloat(r["WS"], 64)
+			la, latErr := strconv.ParseFloat(r["LAT"], 64)
+			lo, lonErr := strconv.ParseFloat(r["LON"], 64)
+			p, pressureErr := strconv.Atoi(r["PS"])
+			w, windErr := strconv.ParseFloat(r["WS"], 64)
+			if latErr != nil || lonErr != nil || pressureErr != nil || windErr != nil {
+				continue
+			}
 			t.ForecastPoints = append(t.ForecastPoints, ingest.Point{ForecastAt: ft.Format(time.RFC3339), Latitude: la, Longitude: lo, Pressure: &p, MaxWind: &w})
 		}
 		batch.Records.Typhoons = append(batch.Records.Typhoons, t)

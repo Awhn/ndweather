@@ -10,9 +10,9 @@ sha256sum internal-weather-system_1.0.0.tar > internal-weather-system_1.0.0.tar.
 ```bash
 sha256sum -c internal-weather-system_1.0.0.tar.sha256
 docker load -i internal-weather-system_1.0.0.tar
-docker compose -f docker-compose.internal.yml up -d
+docker compose --env-file .env.internal -f docker-compose.internal.yml up -d
 ```
 방화벽은 송신 연계 시스템과 TV/조회 단말에서 `${HOST_IP}:${HOST_PORT}` TCP만 허용합니다. IP/포트는 `.env.internal`의 `HOST_IP`, `HOST_PORT`만 바꾸고 재생성합니다. 컨테이너 내부는 항상 8080입니다.
 
 ## 운용
-`up -d`, `stop`, `restart weather-system`, `logs -f --tail=200 weather-system`, `down`을 사용합니다. 초기화는 반드시 승인 후 `down -v`(전체 이력 삭제)합니다. 인터넷 차단 시험은 `docker compose ... down`, 호스트 uplink 차단, 다시 `up -d`한 뒤 health/display/API와 기존 데이터 확인으로 수행합니다. Compose는 read-only root, `/tmp` tmpfs, capabilities 제거, non-root UID를 적용합니다. HTTP directory 모드라면 `/data/inbox`에 같은 파일시스템 rename으로 완성된 UTF-8 JSON만 넣습니다.
+모든 명령에 `docker compose --env-file .env.internal -f docker-compose.internal.yml`을 사용한 뒤 `up -d`, `stop`, `restart weather-system`, `logs -f --tail=200 weather-system`, `down`을 붙입니다. `--env-file`을 빼면 `HOST_IP`와 `HOST_PORT`가 기본값으로 대체됩니다. 초기화는 반드시 승인 후 `down -v`(전체 이력 삭제)합니다. 인터넷 차단 시험은 서비스를 내리고 호스트 uplink를 차단한 뒤 다시 올려 health/display/API와 기존 데이터를 확인합니다. Compose는 read-only root, `/tmp` tmpfs, capabilities 제거, non-root UID를 적용합니다. directory 모드라면 `/data/inbox`에 같은 파일시스템 rename으로 완성된 UTF-8 JSON만 넣습니다.

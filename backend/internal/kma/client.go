@@ -7,6 +7,7 @@ import (
 	"math"
 	"net/http"
 	"net/url"
+	"regexp"
 	"strconv"
 	"strings"
 	"time"
@@ -38,6 +39,8 @@ type response struct {
 	} `json:"response"`
 }
 
+var precipitationNumber = regexp.MustCompile(`^[0-9]+(?:\.[0-9]+)?`)
+
 func (c *Client) Fetch(ctx context.Context, site store.Site, now time.Time) (ingest.Batch, error) {
 	loc := c.Location
 	if loc == nil {
@@ -54,7 +57,9 @@ func (c *Client) Fetch(ctx context.Context, site store.Site, now time.Time) (ing
 	}
 	q := u.Query()
 	serviceKey := c.ServiceKey
-	if decoded, decodeErr := url.QueryUnescape(serviceKey); decodeErr == nil {
+	// Public-data keys may be supplied encoded or decoded. PathUnescape decodes
+	// percent escapes without corrupting a literal '+' in a decoded key.
+	if decoded, decodeErr := url.PathUnescape(serviceKey); decodeErr == nil {
 		serviceKey = decoded
 	}
 	q.Set("serviceKey", serviceKey)
@@ -76,7 +81,10 @@ func (c *Client) Fetch(ctx context.Context, site store.Site, now time.Time) (ing
 	}
 	res, err := h.Do(req)
 	if err != nil {
-		return ingest.Batch{}, err
+		if requestErr, ok := err.(*url.Error); ok {
+			err = requestErr.Err
+		}
+		return ingest.Batch{}, fmt.Errorf("KMA request failed: %w", err)
 	}
 	defer res.Body.Close()
 	if res.StatusCode != http.StatusOK {
@@ -154,7 +162,10 @@ func normalize(site store.Site, issued, now time.Time, loc *time.Location, items
 	return b, nil
 }
 
-func number(s string) (float64, bool) { n, e := strconv.ParseFloat(s, 64); return n, e == nil }
+func number(s string) (float64, bool) {
+	n, e := strconv.ParseFloat(s, 64)
+	return n, e == nil && !math.IsNaN(n) && !math.IsInf(n, 0)
+}
 func pointer(s string) (*float64, bool) {
 	n, ok := number(s)
 	if !ok {
@@ -185,16 +196,17 @@ func precipitationState(v string) string {
 	return map[string]string{"0": "없음", "1": "비", "2": "비/눈", "3": "눈", "4": "소나기"}[v]
 }
 func precipitation(v string) float64 {
-	fields := strings.Fields(v)
-	if len(fields) == 0 || v == "강수없음" {
+	v = strings.TrimSpace(v)
+	if v == "" || v == "강수없음" {
 		return 0
 	}
-	n, _ := strconv.ParseFloat(fields[0], 64)
+	match := precipitationNumber.FindString(v)
+	n, _ := strconv.ParseFloat(match, 64)
 	return n
 }
 func direction(v string) string {
 	n, ok := number(v)
-	if !ok {
+	if !ok || n < 0 || n > 360 {
 		return ""
 	}
 	names := []string{"북", "북동", "동", "남동", "남", "남서", "서", "북서"}
