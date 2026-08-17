@@ -52,7 +52,7 @@
 # 주소 출처: https://www.koenergy.kr/kosep/hw/fr/ov/ovhw32/main.do?menuCd=FN030702
 # 좌표 출처: https://www.data.go.kr/data/15037039/fileData.do?recommendDataYn=Y
 - code: BUNDANG
-  name: 분당발전본부
+  name: 분당
   latitude: 37.3656100
   longitude: 127.1467400
   forecastGridX: 63
