@@ -10,7 +10,7 @@
 # 주소 출처: https://www.koenergy.kr/kosep/hw/fr/ov/ovhw31/main.do?menuCd=FN030701
 # 좌표 출처: https://findby.co.kr/details/52852-481703350089-st-652c085ff27008be2c4a5fc1
 - code: HQ
-  name: 한국남동발전 본사
+  name: 본사
   latitude: 35.1803572
   longitude: 128.1455947
   forecastGridX: 81
@@ -24,7 +24,7 @@
 # 주소 출처: https://www.koenergy.kr/kosep/hw/fr/ov/ovhw32/main.do?menuCd=FN030702
 # 좌표 출처: https://rlh.purpleo.kr/article/3122
 - code: SAMCHEONPO
-  name: 삼천포발전본부
+  name: 삼천포
   latitude: 34.9109650
   longitude: 128.1092482
   forecastGridX: 81
@@ -38,7 +38,7 @@
 # 주소 출처: https://www.koenergy.kr/kosep/hw/fr/ov/ovhw32/main.do?menuCd=FN030702
 # 좌표 출처: https://findby.co.kr/details/23120-287204274155-st-652b76bf8c641f9e38a806c9
 - code: YEONGHEUNG
-  name: 영흥발전본부
+  name: 영흥
   latitude: 37.2399356
   longitude: 126.4384846
   forecastGridX: 51
@@ -66,7 +66,7 @@
 # 주소 출처: https://www.koenergy.kr/kosep/hw/fr/ov/ovhw32/main.do?menuCd=FN030702
 # 좌표 출처: https://www.data.go.kr/data/15155662/standard.do?recommendDataYn=Y
 - code: YEONGDONG_ECO
-  name: 영동에코발전본부
+  name: 영동
   latitude: 37.7384122
   longitude: 128.9766237
   forecastGridX: 94
@@ -80,7 +80,7 @@
 # 주소 출처: https://www.koenergy.kr/kosep/hw/fr/ov/ovhw44/main.do?menuCd=FN030706
 # 좌표 출처: https://trb.purpleo.kr/article/58683
 - code: YEOSU
-  name: 여수발전본부
+  name: 여수
   latitude: 34.8400082
   longitude: 127.6908469
   forecastGridX: 73
@@ -95,7 +95,7 @@
 # 사업지 참고: https://www.jejusori.net/news/articleView.html?idxno=177849
 # 대표점 참고: https://www.visitjeju.net/kr/detail/view?contentsid=CNTS_200000000014030
 - code: JEJU_EOEUM_WIND
-  name: 제주 어음풍력발전사업
+  name: 제주
   latitude: 33.3776440
   longitude: 126.3681720
   forecastGridX: 50
