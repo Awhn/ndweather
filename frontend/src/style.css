@@ -1,3 +1,4 @@
+:root{--card-text-size:clamp(18px,1.25vw,48px);--card-title-size:clamp(22px,1.5vw,58px);--temperature-size:clamp(52px,3.5vw,134px)}
 *{box-sizing:border-box}
 html,body,#root{margin:0;width:100%;height:100%;overflow:hidden}
 body{font-family:Arial,"Noto Sans KR",sans-serif;background:#061221;color:#eef7ff}
@@ -15,15 +16,15 @@ h1{font-size:1.8vw;margin:0}
 .card,.right article,.radar{background:#0b2134;border:1px solid #284b64;border-radius:.6vw;box-shadow:0 .5vw 1vw #0005}
 h2{font-size:1.25vw;margin:.5vh 0 1vh}
 .cards{display:grid;grid-template-columns:repeat(7,minmax(0,1fr));gap:1vw;height:100%}
-.card{height:100%;min-width:0;padding:1vw;position:relative}
-.title{display:flex;flex-direction:column;gap:.5vh;min-height:7vh}
-.title h2{font-size:1.25vw;overflow-wrap:anywhere}.title code{color:#77c9e9;font-size:.8vw}
-.temp{font-size:3.5vw;color:#58d5ff;line-height:1;margin:2vh 0}.temp small{font-size:1.2vw}
-dl{display:grid;grid-template-columns:1fr;gap:1vh;margin:2vh 0}
-dl div{display:flex;flex-direction:column;gap:.4vh;border-bottom:1px solid #28475c;padding:.7vh 0}
-dt{color:#8faec1}dd{margin:0;font-weight:bold;overflow-wrap:anywhere}
-.warning{background:#392c13;color:#ffd26c;padding:.7vh .7vw;border-radius:.3vw;overflow-wrap:anywhere}
-.card time{display:block;color:#91a8b7;margin-top:1vh;font-size:.8vw;overflow-wrap:anywhere}
+.card{height:100%;min-width:0;padding:1vw;position:relative;font-size:var(--card-text-size);line-height:1.3}
+.title{display:flex;flex-direction:column;gap:.5vh;min-height:8vh}
+.title h2{font-size:var(--card-title-size);line-height:1.2;overflow-wrap:anywhere}.title code{color:#9bdcf4;font-size:var(--card-text-size);line-height:1.3;overflow-wrap:anywhere}
+.temp{font-size:var(--temperature-size);color:#58d5ff;line-height:1;margin:1.4vh 0}.temp small{font-size:var(--card-text-size);line-height:1.3}
+dl{display:grid;grid-template-columns:1fr;gap:.5vh;margin:1vh 0;font-size:inherit}
+dl div{display:flex;flex-direction:column;gap:.25vh;border-bottom:1px solid #28475c;padding:.55vh 0}
+dt{color:#a9c0cf;font-weight:600}dd{margin:0;font-weight:bold;overflow-wrap:anywhere}
+.card .temp,.card dd,.card time{font-variant-numeric:tabular-nums}
+.card time{display:block;color:#b6cad6;margin-top:.8vh;font-size:var(--card-text-size);line-height:1.3;overflow-wrap:anywhere}
 .page2{display:grid;grid-template-columns:60% 1fr;gap:1vw}
 .radar{padding:1vw;display:flex;flex-direction:column}.radar h2{display:flex;justify-content:space-between}
 .radar img{width:100%;height:72vh;object-fit:contain;background:#030a10}
@@ -35,5 +36,5 @@ dt{color:#8faec1}dd{margin:0;font-weight:bold;overflow-wrap:anywhere}
 footer{font-size:.9vw;border-top:1px solid #31516b;border-bottom:0}
 .controls{display:flex;gap:.5vw}.controls button{border:1px solid #426985;border-radius:.25vw;background:#102b40;color:#eef7ff;padding:.35vh .6vw;font:inherit;cursor:pointer}.controls button:focus-visible{outline:2px solid #58d5ff;outline-offset:2px}
 @keyframes fade{from{opacity:0}to{opacity:1}}
-@media(max-width:1400px){.title h2{font-size:1.1vw}dl{font-size:.9vw}}
+@media(max-width:1400px){.card{padding:.75vw}.title{min-height:8vh}.temp{margin:1vh 0}dl{gap:.35vh;margin:.8vh 0}dl div{padding:.3vh 0}.card time{margin-top:.6vh}}
 @media(prefers-reduced-motion:reduce){.page{animation:none}}
